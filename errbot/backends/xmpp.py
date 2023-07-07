@@ -362,6 +362,7 @@ class XMPPConnection:
         self.client.register_plugin("xep_0199")  # XMPP Ping
         self.client.register_plugin("xep_0203")  # XMPP Delayed messages
         self.client.register_plugin("xep_0249")  # XMPP direct MUC invites
+        self.client.register_plugin("xep_0363")  # HTTP Upload
 
         if keepalive is not None:
             self.client.whitespace_keepalive = (
