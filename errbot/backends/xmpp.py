@@ -591,6 +591,25 @@ class XMPPBackend(ErrBot):
             mtype="chat" if msg.is_direct else "groupchat",
         )
 
+    def send_url_message(self, url) -> None:
+#        super().send_message(msg)
+#
+#       log.debug("send_message to %s", msg.to)
+
+        # We need to unescape the unicode characters (not the markup incompatible ones)
+#        mhtml = (
+#            xhtmlim.unescape(self.md_xhtml.convert(msg.body)) if self.xhtmlim else None
+#        )
+        url = "http://pbs.twimg.com/media/F0flUqJWcAId1ts.jpg"
+        self.conn.client.make_messgae(mto="hlad@hlad.org", mbody=url)
+#        self.conn.client.send_message(
+#            mto=str(msg.to),
+#            mbody=self.md_text.convert(msg.body),
+#           mhtml=mhtml,
+#            mtype="chat" if msg.is_direct else "groupchat",
+#        )
+    
+
     def change_presence(self, status: str = ONLINE, message: str = "") -> None:
         log.debug("Change bot status to %s, message %s.", status, message)
         self.conn.client.send_presence(pshow=status, pstatus=message)
