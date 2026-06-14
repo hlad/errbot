@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import sys
 from datetime import datetime
@@ -396,7 +397,7 @@ class XMPPConnection:
         self.connected = False
 
     def serve_forever(self) -> None:
-        self.client.process()
+        asyncio.get_event_loop().run_forever()
 
     def add_event_handler(self, name: str, cb: Callable) -> None:
         self.client.add_event_handler(name, cb)
