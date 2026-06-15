@@ -7,7 +7,6 @@ from threading import Thread
 from urllib.request import unquote
 
 from OpenSSL import crypto
-from webtest import TestApp
 from werkzeug.serving import ThreadedWSGIServer
 
 from errbot import BotPlugin, botcmd, webhook
@@ -57,7 +56,6 @@ class Webserver(BotPlugin):
         self.server = None
         self.server_thread = None
         self.ssl_context = None
-        self.test_app = TestApp(flask_app)
         super().__init__(*args, **kwargs)
 
     def get_configuration_template(self):
@@ -75,14 +73,14 @@ class Webserver(BotPlugin):
 
     def check_configuration(self, configuration):
         # it is a pain, just assume a default config if SSL is absent or set to None
+        ssl_template = self.get_configuration_template()["SSL"]
         if configuration.get("SSL", None) is None:
-            configuration["SSL"] = {
-                "enabled": False,
-                "host": "0.0.0.0",
-                "port": 3142,
-                "certificate": "",
-                "key": "",
-            }
+            configuration["SSL"] = ssl_template
+        else:
+            # fill in missing keys from template if they are absent
+            for k, v in ssl_template.items():
+                if k not in configuration["SSL"]:
+                    configuration["SSL"][k] = v
         super().check_configuration(configuration)
 
     def activate(self):
@@ -180,7 +178,9 @@ class Webserver(BotPlugin):
 
         self.log.debug("Detected your post as : %s.", contenttype)
 
-        response = self.test_app.post(url, params=content, content_type=contenttype)
+        with flask_app.test_client() as client:
+            response = client.post(url, data=content, content_type=contenttype)
+
         return {
             "url": url,
             "content": content,
